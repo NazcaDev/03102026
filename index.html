@@ -183,9 +183,6 @@
   .start-btn:active { transform: translateY(0) scale(0.98); }
   .splash-note { margin-top: 20px; font-size: 0.75rem; color: rgba(255,255,255,0.55); font-family: sans-serif; max-width: 300px; line-height: 1.5; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
 
-  /* TEST YAZISI */
-  .debug-info { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #ff9ecb; z-index: 99; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 8px; display: none; }
-
   .float-heart { position: fixed; bottom: -40px; pointer-events: none; z-index: 4; animation: floatUp linear forwards; will-change: transform, opacity; }
   @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg) scale(0.6); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-115vh) rotate(400deg) scale(1); opacity: 0; } }
 
@@ -221,9 +218,8 @@
   <div class="splash-note">🎵 Kulaklığını tak, sesini aç.</div>
 </div>
 
-<!-- MP3 AUDIO -->
-<audio id="audioPlayer" preload="auto" loop src="./sarki.mp3"></audio>
-<div class="debug-info" id="debugInfo">Ses yüklenmedi...</div>
+<!-- WAV AUDIO (MP3 yerine WAV kullanıyoruz) -->
+<audio id="audioPlayer" preload="auto" loop src="./sarki.wav"></audio>
 
 <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
@@ -405,7 +401,6 @@ const playBtn = document.getElementById('playBtn');
 const muteBtn = document.getElementById('muteBtn');
 const timeDisplay = document.getElementById('timeDisplay');
 const progressFill = document.getElementById('progressFill');
-const debugInfo = document.getElementById('debugInfo');
 let musicOn = false; let audioReady = false;
 
 audio.addEventListener('loadedmetadata', () => {
@@ -416,10 +411,8 @@ audio.addEventListener('loadedmetadata', () => {
 
 audio.addEventListener('error', (e) => {
   const code = audio.error ? audio.error.code : '?';
-  debugInfo.style.display = 'block';
-  debugInfo.textContent = 'HATA: Ses dosyası yüklenemedi (Kod: ' + code + ')';
-  debugInfo.style.background = 'red';
-  timeDisplay.textContent = '⚠️ Ses yüklenemedi';
+  timeDisplay.textContent = '⚠️ Ses yüklenemedi (Kod: ' + code + ')';
+  console.error('Ses hatası kodu:', code);
 });
 
 audio.addEventListener('play', () => {
@@ -443,9 +436,7 @@ function startPlayback() {
   audio.play().catch(err => {
     audio.volume = 0.001;
     audio.play().then(() => { audio.volume = 1; }).catch(e2 => {
-      debugInfo.style.display = 'block';
-      debugInfo.textContent = 'HATA: Tarayıcı ses çalmayı engelledi.';
-      debugInfo.style.background = 'red';
+      console.warn('Tarayıcı ses çalmayı engelledi.');
     });
   });
 }
