@@ -652,4 +652,426 @@
 
   <!-- 4: KASIMPATI -->
   <section class="scene" data-duration="6500">
-    <h
+    <h1>İşte Senin Kasımpatın</h1>
+    <div class="flower-stage" id="flowerStage"></div>
+    <p style="margin-top:20px; opacity:.7; font-size:.9em;">(Çiçeğe dokun ✨)</p>
+  </section>
+
+  <!-- 5: ANLAMI -->
+  <section class="scene" data-duration="6000">
+    <h1>Kasımpatı Neden?</h1>
+    <p>Kasımpatı, sonbaharın en inatçı çiçeğidir.<br>
+    Soğuğa göğüs gerer, yalnız açar, yine de güzeldir.<br><br>
+    Tıpkı bizim gibi — mesafeye, bekleyişe ve özleme rağmen<br>
+    her gün yeniden açmayı seçen...</p>
+  </section>
+
+  <!-- 6: ÇİFT (çiçek veriyor) -->
+  <section class="scene" data-duration="7000">
+    <h1>Keşke Şimdi Yanında Olsam</h1>
+    <div class="couple" id="couple1">
+      <div class="couple-heart">💕</div>
+      <div class="person left">
+        <div class="head"><span class="cheek l"></span><span class="cheek r"></span></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+      </div>
+      <div class="flying-flower">🌼</div>
+      <div class="person right">
+        <div class="head"><span class="cheek l"></span><span class="cheek r"></span></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+        <div class="held-flower">🌼</div>
+      </div>
+    </div>
+    <p style="margin-top:20px;">Sana bu çiçeği uzatıyorum...<br>
+    Ellerimle tutamasam da, kalbimle birlikte.</p>
+  </section>
+
+  <!-- 7: SARI LMA (final çift) -->
+  <section class="scene" data-duration="9000">
+    <h1>Bir Gün...</h1>
+    <div class="couple hugging" id="couple2">
+      <div class="person left">
+        <div class="head"><span class="cheek l"></span><span class="cheek r"></span></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+      </div>
+      <div class="person right">
+        <div class="head"><span class="cheek l"></span><span class="cheek r"></span></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+      </div>
+    </div>
+    <div class="hug-hearts show" id="hugHearts"></div>
+    <p style="margin-top:20px;">Sana sarıldığım o gün,<br>
+    çiçekten çok daha güzel olacak.</p>
+  </section>
+
+  <!-- 8: FİNAL -->
+  <section class="scene" data-duration="99999" data-last="true">
+    <div class="big-heart">💖</div>
+    <h1 style="margin-top:16px;">Hep Yanındayım</h1>
+    <p>Uzaklık sadece bir mesafe,<br>
+    kalbim her zaman seninle.<br><br>
+    Bu kasım da, her kasım da...<br>
+    <b style="color:var(--pink);">Kasımpatısız bırakmayacağım seni.</b></p>
+    <div class="signature">— Seni çok seviyorum ♡</div>
+    <div style="margin-top:30px;">
+      <button class="start-btn" id="replayBtn" style="padding:14px 30px; font-size:.95rem;">↺ Baştan İzle</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="controls" id="controls">
+  <button class="ctrl-btn" id="prevBtn" title="Önceki" aria-label="Önceki">⏮</button>
+  <button class="ctrl-btn primary" id="playBtn" title="Müzik" aria-label="Oynat/Durdur">▶</button>
+  <button class="ctrl-btn" id="nextBtn" title="Sonraki" aria-label="Sonraki">⏭</button>
+  <button class="ctrl-btn" id="muteBtn" title="Sessiz" aria-label="Sessiz">🔊</button>
+</div>
+
+<div class="skip-hint">↘ Otomatik akıyor</div>
+
+<script>
+/* ============================================================
+   AYARLAR
+============================================================ */
+const YOUTUBE_VIDEO_ID = "D4nJxWY_FTI";
+const START_AT = 39;
+
+/* ============================================================
+   YILDIZLAR
+============================================================ */
+(function createStars() {
+  const n = window.innerWidth < 600 ? 50 : 80;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 1;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = (Math.random() * 3) + 's';
+    s.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    document.body.appendChild(s);
+  }
+})();
+
+/* ============================================================
+   ÇİÇEK
+============================================================ */
+function buildFlower(container) {
+  const bloom = document.createElement('div');
+  bloom.className = 'bloom';
+  const baseW = Math.min(window.innerWidth * 0.32, 200);
+  const layers = [
+    { count: 18, scale: 1.00, rot: 0,  delay: 0.00 },
+    { count: 16, scale: 0.84, rot: 11, delay: 0.14 },
+    { count: 14, scale: 0.68, rot: 6,  delay: 0.28 },
+    { count: 12, scale: 0.53, rot: 14, delay: 0.42 },
+    { count: 10, scale: 0.38, rot: 8,  delay: 0.56 }
+  ];
+  layers.forEach((layer, li) => {
+    for (let i = 0; i < layer.count; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      const angle = (360 / layer.count) * i + layer.rot;
+      const w = baseW * 0.13 * layer.scale;
+      const h = baseW * 0.34 * layer.scale;
+      petal.style.width = w + 'px';
+      petal.style.height = h + 'px';
+      petal.style.marginLeft = (-w / 2) + 'px';
+      petal.style.marginTop = (-h) + 'px';
+      petal.style.transform = `rotate(${angle}deg)`;
+      petal.style.animationDelay = (layer.delay + Math.random() * 0.2) + 's';
+      petal.style.zIndex = 30 - li;
+      if (li > 2) petal.style.filter = 'brightness(1.14)';
+      bloom.appendChild(petal);
+    }
+  });
+  const center = document.createElement('div');
+  center.className = 'center';
+  bloom.appendChild(center);
+  const stem = document.createElement('div');
+  stem.className = 'stem';
+  stem.appendChild(Object.assign(document.createElement('div'), { className: 'leaf left' }));
+  stem.appendChild(Object.assign(document.createElement('div'), { className: 'leaf right' }));
+  const wrap = document.createElement('div');
+  wrap.className = 'flower-wrap';
+  wrap.appendChild(bloom);
+  wrap.appendChild(stem);
+  wrap.style.cursor = 'pointer';
+  wrap.addEventListener('click', () => {
+    for (let i = 0; i < 20; i++) setTimeout(createHeart, i * 55);
+  });
+  container.appendChild(wrap);
+}
+buildFlower(document.getElementById('flowerStage'));
+
+/* ============================================================
+   SARI LMA KALPLERİ
+============================================================ */
+(function initHugHearts() {
+  const wrap = document.getElementById('hugHearts');
+  if (!wrap) return;
+  for (let i = 0; i < 12; i++) {
+    const h = document.createElement('div');
+    h.className = 'hug-heart';
+    h.textContent = ['💕','💖','💗','🌸','💞'][Math.floor(Math.random()*5)];
+    h.style.left = (10 + Math.random() * 80) + '%';
+    h.style.top = (30 + Math.random() * 40) + '%';
+    h.style.animationDelay = (Math.random() * 2) + 's';
+    h.style.animationDuration = (1.8 + Math.random() * 1.5) + 's';
+    wrap.appendChild(h);
+  }
+})();
+
+/* ============================================================
+   KALP / KONFETİ
+============================================================ */
+const heartSet = ['❤️', '💕', '💖', '🌸', '💗', '🌼', '💝', '💞'];
+function createHeart() {
+  const h = document.createElement('div');
+  h.className = 'float-heart';
+  h.textContent = heartSet[Math.floor(Math.random() * heartSet.length)];
+  h.style.left = Math.random() * 100 + 'vw';
+  h.style.fontSize = (Math.random() * 22 + 14) + 'px';
+  h.style.animationDuration = (Math.random() * 3 + 4) + 's';
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 8000);
+}
+
+function confettiBurst() {
+  const emojis = ['🌸', '💖', '🌼', '✨', '💕', '⭐'];
+  const n = window.innerWidth < 600 ? 20 : 34;
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.fontSize = (Math.random() * 16 + 12) + 'px';
+    c.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+    c.style.animationDelay = (Math.random() * 0.4) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+  }
+}
+
+/* ============================================================
+   YOUTUBE API
+============================================================ */
+let ytPlayer = null;
+let ytReady = false;
+let pendingPlay = false;
+let musicOn = false;
+let musicMuted = false;
+
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(tag);
+
+window.onYouTubeIframeAPIReady = function() {
+  ytPlayer = new YT.Player('ytPlayer', {
+    height: '180', width: '320',
+    videoId: YOUTUBE_VIDEO_ID,
+    playerVars: {
+      autoplay: 0, controls: 0, disablekb: 1,
+      modestbranding: 1, rel: 0, playsinline: 1,
+      start: START_AT, loop: 0, fs: 0, iv_load_policy: 3
+    },
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange,
+      'onError': onPlayerError
+    }
+  });
+};
+
+function onPlayerReady() {
+  ytReady = true;
+  const dur = ytPlayer.getDuration() || 0;
+  timeDisplay.textContent = formatTime(START_AT) + ' / ' + formatTime(dur);
+  if (pendingPlay) { pendingPlay = false; actuallyPlay(); }
+}
+function onPlayerStateChange(e) {
+  if (e.data === YT.PlayerState.PLAYING) {
+    musicOn = true;
+    playBtn.textContent = '⏸';
+    playBtn.classList.add('playing');
+    timeDisplay.classList.add('active');
+  } else if (e.data === YT.PlayerState.PAUSED) {
+    musicOn = false;
+    playBtn.textContent = '▶';
+    playBtn.classList.remove('playing');
+  } else if (e.data === YT.PlayerState.ENDED) {
+    musicOn = false;
+    playBtn.textContent = '▶';
+    playBtn.classList.remove('playing');
+  }
+}
+function onPlayerError(e) {
+  console.error('YouTube hata:', e.data);
+  fallbackEmbed();
+}
+function actuallyPlay() {
+  if (!ytReady || !ytPlayer || !ytPlayer.playVideo) { pendingPlay = true; return; }
+  ytPlayer.seekTo(START_AT, true);
+  ytPlayer.playVideo();
+  if (musicMuted) ytPlayer.mute();
+}
+function fallbackEmbed() {
+  const wrap = document.getElementById('ytPlayer');
+  wrap.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&start=${START_AT}&controls=0&modestbranding=1&rel=0&playsinline=1`;
+  iframe.style.cssText = 'width:320px;height:180px;border:0;';
+  iframe.allow = 'autoplay; encrypted-media';
+  wrap.appendChild(iframe);
+}
+
+/* ============================================================
+   KONTROL BUTONLARI
+============================================================ */
+const playBtn = document.getElementById('playBtn');
+const muteBtn = document.getElementById('muteBtn');
+const timeDisplay = document.getElementById('timeDisplay');
+const progressFill = document.getElementById('progressFill');
+
+playBtn.addEventListener('click', () => {
+  if (!ytReady) { pendingPlay = true; return; }
+  if (musicOn) ytPlayer.pauseVideo();
+  else actuallyPlay();
+});
+muteBtn.addEventListener('click', () => {
+  if (!ytReady) return;
+  musicMuted = !musicMuted;
+  if (musicMuted) ytPlayer.mute(); else ytPlayer.unMute();
+  muteBtn.textContent = musicMuted ? '🔇' : '🔊';
+});
+
+function formatTime(s) {
+  s = Math.max(0, Math.floor(s));
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+setInterval(() => {
+  if (!ytReady || !ytPlayer || !ytPlayer.getCurrentTime || !started) return;
+  const cur = ytPlayer.getCurrentTime() || 0;
+  const dur = ytPlayer.getDuration() || 0;
+  progressFill.style.width = (dur > 0 ? (cur / dur) * 100 : 0) + '%';
+  timeDisplay.textContent = formatTime(cur) + ' / ' + formatTime(dur);
+}, 500);
+
+/* ============================================================
+   OTOMATİK SAHNE SİSTEMİ
+============================================================ */
+const stage = document.getElementById('stage');
+const scenes = document.querySelectorAll('.scene');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+let currentScene = 0;
+let started = false;
+let autoTimer = null;
+let paused = false;
+
+function goToScene(idx) {
+  if (idx < 0 || idx >= scenes.length) return;
+  if (idx === currentScene && scenes[idx].classList.contains('active')) return;
+  scenes[currentScene].classList.remove('active');
+  currentScene = idx;
+  scenes[currentScene].classList.add('active');
+  scenes[currentScene].scrollTop = 0;
+
+  // Sarılma sahnesinde kalp patlaması
+  if (scenes[currentScene].querySelector('.couple.hugging')) {
+    setTimeout(() => {
+      for (let i = 0; i < 20; i++) setTimeout(createHeart, i * 80);
+    }, 800);
+  }
+  // Genel geçişte konfeti
+  confettiBurst();
+  for (let i = 0; i < 6; i++) setTimeout(createHeart, i * 100);
+
+  scheduleNext();
+}
+
+function scheduleNext() {
+  clearTimeout(autoTimer);
+  if (paused) return;
+  const dur = parseInt(scenes[currentScene].dataset.duration || 6000);
+  if (scenes[currentScene].dataset.last === 'true') return; // son sahne durur
+  autoTimer = setTimeout(() => {
+    if (currentScene < scenes.length - 1) goToScene(currentScene + 1);
+  }, dur);
+}
+
+prevBtn.addEventListener('click', () => {
+  paused = true;
+  goToScene(currentScene - 1);
+});
+nextBtn.addEventListener('click', () => {
+  paused = true;
+  goToScene(currentScene + 1);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); nextBtn.click(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevBtn.click(); }
+});
+
+/* ============================================================
+   SPARKLE alanları
+============================================================ */
+scenes.forEach(scene => {
+  const field = document.createElement('div');
+  field.className = 'sparkle-field';
+  for (let i = 0; i < 8; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'sparkle';
+    sp.style.left = Math.random() * 100 + '%';
+    sp.style.top = Math.random() * 100 + '%';
+    sp.style.animationDelay = (Math.random() * 5) + 's';
+    sp.style.animationDuration = (Math.random() * 3 + 4) + 's';
+    field.appendChild(sp);
+  }
+  scene.appendChild(field);
+});
+
+/* ============================================================
+   BAŞLANGIÇ
+============================================================ */
+const splash = document.getElementById('splash');
+const startBtn = document.getElementById('startBtn');
+
+startBtn.addEventListener('click', () => {
+  splash.classList.add('gone');
+  started = true;
+  actuallyPlay();
+  confettiBurst();
+  setTimeout(() => {
+    for (let i = 0; i < 6; i++) setTimeout(createHeart, i * 100);
+  }, 500);
+  scheduleNext();
+});
+
+document.getElementById('replayBtn').addEventListener('click', () => {
+  paused = false;
+  if (ytReady && ytPlayer.seekTo) {
+    ytPlayer.seekTo(START_AT, true);
+    if (!musicOn) ytPlayer.playVideo();
+  }
+  goToScene(0);
+  confettiBurst();
+  for (let i = 0; i < 20; i++) setTimeout(createHeart, i * 60);
+});
+
+setInterval(() => {
+  if (Math.random() > 0.6) createHeart();
+}, 4000);
+</script>
+</body>
+</html>
