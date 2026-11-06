@@ -755,11 +755,9 @@
 <script>
 /* ============================================================
    AYARLAR
-   - MP3 dosyasının adı: sarki.mp3  (HTML ile aynı klasörde)
-   - Şarkı 0:39'dan başlayacak
 ============================================================ */
-const AUDIO_SRC = "sarki.mp3";
-const START_AT = 39;
+const START_AT = 39;           // 0:39'dan başla
+const AUDIO_FILE = "sarki.mp3"; // MP3 dosya adı
 
 /* ============================================================
    YILDIZLAR
@@ -902,8 +900,7 @@ function confettiBurst() {
 }
 
 /* ============================================================
-   🎵 AUDIO KONTROLÜ
-   Reklam yok, YouTube yok — doğrudan HTML5 Audio
+   🎵 AUDIO KONTROLÜ (sağlam versiyon)
 ============================================================ */
 const audio = document.getElementById('audioPlayer');
 const playBtn = document.getElementById('playBtn');
@@ -913,19 +910,18 @@ const progressFill = document.getElementById('progressFill');
 let musicOn = false;
 let audioReady = false;
 
-// Metadata yüklenince süreyi al ve 0:39'a atla
+// Yükleme
 audio.addEventListener('loadedmetadata', () => {
   audioReady = true;
-  // Başlangıç zamanını ayarla
-  if (audio.currentTime < START_AT) {
-    audio.currentTime = START_AT;
-  }
+  console.log('✅ Ses yüklendi. Süre:', audio.duration);
   timeDisplay.textContent = formatTime(START_AT) + ' / ' + formatTime(audio.duration);
+  // 0:39'a atla
+  try {
+    if (audio.currentTime < START_AT) audio.currentTime = START_AT;
+  } catch(e) { console.warn('Seek hatası:', e); }
 });
 
-audio.addEventListener('canplay', () => {
-  audioReady = true;
-});
+audio.addEventListener('canplay', () => { audioReady = true; });
 
 audio.addEventListener('play', () => {
   musicOn = true;
@@ -940,34 +936,46 @@ audio.addEventListener('pause', () => {
   playBtn.classList.remove('playing');
 });
 
-audio.addEventListener('ended', () => {
-  musicOn = false;
-  playBtn.textContent = '▶';
-  playBtn.classList.remove('playing');
-});
-
 audio.addEventListener('error', (e) => {
-  console.error('Ses dosyası yüklenemedi. "sarki.mp3" dosyasının HTML ile aynı klasörde olduğundan emin ol.', e);
-  timeDisplay.textContent = '⚠️ sarki.mp3 bulunamadı';
+  const code = audio.error ? audio.error.code : '?';
+  console.error('❌ Ses hatası. Kod:', code, '| Kaynak:', audio.currentSrc || audio.src);
+  let msg = '⚠️ Ses yüklenemedi';
+  if (code === 4) msg = '⚠️ sarki.mp3 bulunamadı';
+  timeDisplay.textContent = msg;
+  timeDisplay.classList.add('active');
 });
 
 function startPlayback() {
-  // Reklam yok, direkt çal
   if (!audioReady) {
+    // Metadata henüz yüklenmediyse bekle, sonra çal
     audio.addEventListener('loadedmetadata', () => {
-      audio.currentTime = START_AT;
+      try { audio.currentTime = START_AT; } catch(e){}
       audio.play().catch(err => console.warn('Play hatası:', err));
     }, { once: true });
+    // Yüklemeyi tetikle
+    audio.load();
     return;
   }
-  // 0:39'dan başlat
-  if (Math.abs(audio.currentTime - START_AT) > 3 || audio.currentTime < START_AT) {
-    audio.currentTime = START_AT;
+  // 0:39'a konumlan
+  try {
+    if (Math.abs(audio.currentTime - START_AT) > 3) {
+      audio.currentTime = START_AT;
+    }
+  } catch(e) {}
+  // Çal
+  const p = audio.play();
+  if (p !== undefined) {
+    p.catch(err => {
+      console.warn('play() engellendi:', err);
+      // Sessiz başlatıp sesi aç dene
+      audio.volume = 0.001;
+      audio.play().then(() => {
+        audio.volume = 1;
+      }).catch(e2 => {
+        console.error('Sessiz de başlamadı:', e2);
+      });
+    });
   }
-  audio.play().catch(err => {
-    console.warn('Çalma engellendi:', err);
-    // Tarayıcı otomatik oynatmayı engellerse buton zaten var
-  });
 }
 
 function stopPlayback() {
@@ -991,13 +999,15 @@ function formatTime(s) {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-// İlerleme çubuğu güncelle
+// İlerleme çubuğu
 setInterval(() => {
   if (!started) return;
   const cur = audio.currentTime || 0;
   const dur = audio.duration || 0;
-  progressFill.style.width = (dur > 0 ? (cur / dur) * 100 : 0) + '%';
-  timeDisplay.textContent = formatTime(cur) + ' / ' + formatTime(dur);
+  if (dur > 0) {
+    progressFill.style.width = (cur / dur) * 100 + '%';
+    timeDisplay.textContent = formatTime(cur) + ' / ' + formatTime(dur);
+  }
 }, 300);
 
 /* ============================================================
@@ -1101,7 +1111,7 @@ startBtn.addEventListener('click', () => {
 document.getElementById('replayBtn').addEventListener('click', () => {
   paused = false;
   clearTimeout(autoTimer);
-  audio.currentTime = START_AT;
+  try { audio.currentTime = START_AT; } catch(e){}
   if (audio.paused) audio.play().catch(e => {});
   showScene(0);
   scheduleNext();
