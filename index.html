@@ -629,4 +629,505 @@
 <div class="stage" id="stage">
 
   <!-- 1: AÇILIŞ -->
-  <
+  <section class="scene active" data-duration="5000">
+    <div class="moon">🌙</div>
+    <h1>Bu hikaye seninle başlıyor</h1>
+    <p>Bir kasım akşamı, uzaklarda bir yerde...<br>Seni düşünerek başladım bu satırlara.</p>
+  </section>
+
+  <!-- 2: UZAKLIK -->
+  <section class="scene" data-duration="6000">
+    <h2>Uzaklık...</h2>
+    <div class="distance">
+      <span class="city">Ben</span>
+      <span class="dots-line">• • • • • • •</span>
+      <span class="city">Sen</span>
+    </div>
+    <h1>Aramızda Kilometreler Var</h1>
+    <p>Her gün birbirimizi ekrandan görüyoruz.<br>
+    Sesini duyduğumda bile özlüyorum seni.</p>
+  </section>
+
+  <!-- 3: KASIM SÖZÜ -->
+  <section class="scene" data-duration="7000">
+    <h1>Kasım Geldi</h1>
+    <p>Havalar soğudu, günler kısaldı...<br>Ama içimde bir sıcaklık var.</p>
+    <div class="quote" style="margin-top:30px;">
+      <p><b>"Uzak olabiliriz ama</b><br>
+      seni <b>kasımda</b> kasımpatısız bırakmam."</p>
+    </div>
+  </section>
+
+  <!-- 4: KASIMPATI -->
+  <section class="scene" data-duration="6500">
+    <h1>İşte Senin Kasımpatın</h1>
+    <div class="flower-stage" id="flowerStage"></div>
+    <p style="margin-top:20px; opacity:.7; font-size:.9em;">(Çiçeğe dokun ✨)</p>
+  </section>
+
+  <!-- 5: ANLAMI -->
+  <section class="scene" data-duration="6000">
+    <h1>Kasımpatı Neden?</h1>
+    <p>Kasımpatı, sonbaharın en inatçı çiçeğidir.<br>
+    Soğuğa göğüs gerer, yalnız açar, yine de güzeldir.<br><br>
+    Tıpkı bizim gibi — mesafeye, bekleyişe ve özleme rağmen<br>
+    her gün yeniden açmayı seçen...</p>
+  </section>
+
+  <!-- 6: ÇİFT (çiçek veriyor) -->
+  <section class="scene" data-duration="7000">
+    <h1>Keşke Şimdi Yanında Olsam</h1>
+    <div class="couple" id="couple1">
+      <div class="couple-heart">💕</div>
+      <div class="person left">
+        <div class="head"><span class="cheek l"></span><span class="cheek r"></span></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+      </div>
+      <div class="flying-flower">🌼</div>
+      <div class="person right">
+        <div class="head"><span class="cheek l"></span><span class="cheek r"></span></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+        <div class="held-flower">🌼</div>
+      </div>
+    </div>
+    <p style="margin-top:20px;">Sana bu çiçeği uzatıyorum...<br>
+    Ellerimle tutamasam da, kalbimle birlikte.</p>
+  </section>
+
+  <!-- 7: SARI LMA -->
+  <section class="scene" data-duration="9000">
+    <h1>Bir Gün...</h1>
+    <div class="couple hugging" id="couple2">
+      <div class="person left">
+        <div class="head"><span class="cheek l"></span><span class="cheek r"></span></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+      </div>
+      <div class="person right">
+        <div class="head"><span class="cheek l"></span><span class="cheek r"></span></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+      </div>
+    </div>
+    <div class="hug-hearts show" id="hugHearts"></div>
+    <p style="margin-top:20px;">Sana sarıldığım o gün,<br>
+    çiçekten çok daha güzel olacak.</p>
+  </section>
+
+  <!-- 8: FİNAL -->
+  <section class="scene" data-duration="99999" data-last="true">
+    <div class="big-heart">💖</div>
+    <h1 style="margin-top:16px;">Hep Yanındayım</h1>
+    <p>Uzaklık sadece bir mesafe,<br>
+    kalbim her zaman seninle.<br><br>
+    Bu kasım da, her kasım da...<br>
+    <b style="color:var(--pink);">Kasımpatısız bırakmayacağım seni.</b></p>
+    <div class="signature">— Seni çok seviyorum ♡</div>
+    <div style="margin-top:30px;">
+      <button class="start-btn" id="replayBtn" style="padding:14px 30px; font-size:.95rem;">↺ Baştan İzle</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="controls" id="controls">
+  <button class="ctrl-btn" id="prevBtn" title="Önceki" aria-label="Önceki">⏮</button>
+  <button class="ctrl-btn primary" id="playBtn" title="Müzik" aria-label="Oynat/Durdur">▶</button>
+  <button class="ctrl-btn" id="nextBtn" title="Sonraki" aria-label="Sonraki">⏭</button>
+  <button class="ctrl-btn" id="muteBtn" title="Sessiz" aria-label="Sessiz">🔊</button>
+</div>
+
+<div class="skip-hint">↘ Otomatik akıyor</div>
+
+<script>
+/* ============================================================
+   AYARLAR
+============================================================ */
+const YOUTUBE_VIDEO_ID = "D4nJxWY_FTI";
+const START_AT = 39;
+
+/* ============================================================
+   YILDIZLAR
+============================================================ */
+(function createStars() {
+  const n = window.innerWidth < 600 ? 50 : 80;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 1;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = (Math.random() * 3) + 's';
+    s.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    document.body.appendChild(s);
+  }
+})();
+
+/* ============================================================
+   KASIMPATI ÇİÇEĞİ
+   Gerçek kasımpatı: ince, çok sayıda, sivri uçlu, katmanlı yapraklar
+============================================================ */
+function buildFlower(container) {
+  const bloom = document.createElement('div');
+  bloom.className = 'bloom';
+  const baseW = Math.min(window.innerWidth * 0.34, 220);
+
+  // Gerçek kasımpatı 20-30 katmanlı olabilir, çok sayıda ince yaprak
+  // Dıştan içe doğru: uzun ve yatık → kısa ve dik
+  const layers = [
+    // Dış katman - uzun, yatık yapraklar
+    { count: 30, len: 0.44, wid: 0.055, rot: 0,   tilt: 0,   delay: 0.00, z: 10, light: 0 },
+    { count: 28, len: 0.42, wid: 0.052, rot: 6.4, tilt: 0,   delay: 0.10, z: 11, light: 0.05 },
+    // Orta-dış
+    { count: 26, len: 0.38, wid: 0.050, rot: 3.8, tilt: 0,   delay: 0.20, z: 12, light: 0.10 },
+    { count: 24, len: 0.34, wid: 0.048, rot: 7.5, tilt: 0,   delay: 0.30, z: 13, light: 0.15 },
+    // Orta
+    { count: 22, len: 0.30, wid: 0.046, rot: 4.0, tilt: 0,   delay: 0.40, z: 14, light: 0.20 },
+    { count: 20, len: 0.26, wid: 0.044, rot: 9.0, tilt: 0,   delay: 0.50, z: 15, light: 0.25 },
+    // Orta-iç
+    { count: 18, len: 0.22, wid: 0.042, rot: 5.0, tilt: 0,   delay: 0.60, z: 16, light: 0.30 },
+    { count: 16, len: 0.19, wid: 0.040, rot: 11.0, tilt: 0,  delay: 0.68, z: 17, light: 0.35 },
+    // İç
+    { count: 14, len: 0.16, wid: 0.038, rot: 6.5, tilt: 0,   delay: 0.76, z: 18, light: 0.40 },
+    { count: 12, len: 0.13, wid: 0.036, rot: 15.0, tilt: 0,  delay: 0.84, z: 19, light: 0.45 },
+    // En iç - merkeze yakın küçük yapraklar
+    { count: 10, len: 0.10, wid: 0.034, rot: 9.0, tilt: 0,   delay: 0.92, z: 20, light: 0.50 }
+  ];
+
+  layers.forEach((layer, li) => {
+    for (let i = 0; i < layer.count; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      const angle = (360 / layer.count) * i + layer.rot;
+      const w = baseW * layer.wid;
+      const h = baseW * layer.len;
+
+      // Yaprak boyutları
+      petal.style.width = w + 'px';
+      petal.style.height = h + 'px';
+      petal.style.marginLeft = (-w / 2) + 'px';
+      petal.style.marginTop = (-h) + 'px';
+
+      // Açı ve hafif rastgele titreşim (doğal görünüm)
+      const jitter = (Math.random() - 0.5) * 4;
+      petal.style.transform = `rotate(${angle + jitter}deg)`;
+
+      // Renk geçişi: dış koyu pembe, iç açık pembe (kasımpatı özelliği)
+      const lighten = layer.light;
+      petal.style.background = `linear-gradient(180deg,
+        hsl(340, 100%, ${88 + lighten * 8}%) 0%,
+        hsl(340, 85%, ${72 + lighten * 12}%) 35%,
+        hsl(335, 75%, ${55 + lighten * 15}%) 75%,
+        hsl(335, 70%, ${45 + lighten * 12}%) 100%)`;
+
+      petal.style.animationDelay = (layer.delay + Math.random() * 0.15) + 's';
+      petal.style.zIndex = layer.z;
+      bloom.appendChild(petal);
+    }
+  });
+
+  const center = document.createElement('div');
+  center.className = 'center';
+  bloom.appendChild(center);
+
+  const stem = document.createElement('div');
+  stem.className = 'stem';
+  stem.appendChild(Object.assign(document.createElement('div'), { className: 'leaf left' }));
+  stem.appendChild(Object.assign(document.createElement('div'), { className: 'leaf right' }));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'flower-wrap';
+  wrap.appendChild(bloom);
+  wrap.appendChild(stem);
+  wrap.style.cursor = 'pointer';
+  wrap.addEventListener('click', () => {
+    for (let i = 0; i < 20; i++) setTimeout(createHeart, i * 55);
+  });
+  container.appendChild(wrap);
+}
+buildFlower(document.getElementById('flowerStage'));
+
+/* ============================================================
+   SARI LMA KALPLERİ
+============================================================ */
+(function initHugHearts() {
+  const wrap = document.getElementById('hugHearts');
+  if (!wrap) return;
+  for (let i = 0; i < 12; i++) {
+    const h = document.createElement('div');
+    h.className = 'hug-heart';
+    h.textContent = ['💕','💖','💗','🌸','💞'][Math.floor(Math.random()*5)];
+    h.style.left = (10 + Math.random() * 80) + '%';
+    h.style.top = (30 + Math.random() * 40) + '%';
+    h.style.animationDelay = (Math.random() * 2) + 's';
+    h.style.animationDuration = (1.8 + Math.random() * 1.5) + 's';
+    wrap.appendChild(h);
+  }
+})();
+
+/* ============================================================
+   KALP / KONFETİ
+============================================================ */
+const heartSet = ['❤️', '💕', '💖', '🌸', '💗', '🌼', '💝', '💞'];
+function createHeart() {
+  const h = document.createElement('div');
+  h.className = 'float-heart';
+  h.textContent = heartSet[Math.floor(Math.random() * heartSet.length)];
+  h.style.left = Math.random() * 100 + 'vw';
+  h.style.fontSize = (Math.random() * 22 + 14) + 'px';
+  h.style.animationDuration = (Math.random() * 3 + 4) + 's';
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 8000);
+}
+
+function confettiBurst() {
+  const emojis = ['🌸', '💖', '🌼', '✨', '💕', '⭐'];
+  const n = window.innerWidth < 600 ? 20 : 34;
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.fontSize = (Math.random() * 16 + 12) + 'px';
+    c.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+    c.style.animationDelay = (Math.random() * 0.4) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+  }
+}
+
+/* ============================================================
+   YOUTUBE API
+============================================================ */
+let ytPlayer = null;
+let ytReady = false;
+let pendingPlay = false;
+let musicOn = false;
+let musicMuted = false;
+
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(tag);
+
+window.onYouTubeIframeAPIReady = function() {
+  ytPlayer = new YT.Player('ytPlayer', {
+    height: '180', width: '320',
+    videoId: YOUTUBE_VIDEO_ID,
+    playerVars: {
+      autoplay: 0, controls: 0, disablekb: 1,
+      modestbranding: 1, rel: 0, playsinline: 1,
+      start: START_AT, loop: 0, fs: 0, iv_load_policy: 3
+    },
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange,
+      'onError': onPlayerError
+    }
+  });
+};
+
+function onPlayerReady() {
+  ytReady = true;
+  const dur = ytPlayer.getDuration() || 0;
+  timeDisplay.textContent = formatTime(START_AT) + ' / ' + formatTime(dur);
+  if (pendingPlay) { pendingPlay = false; actuallyPlay(); }
+}
+function onPlayerStateChange(e) {
+  if (e.data === YT.PlayerState.PLAYING) {
+    musicOn = true;
+    playBtn.textContent = '⏸';
+    playBtn.classList.add('playing');
+    timeDisplay.classList.add('active');
+  } else if (e.data === YT.PlayerState.PAUSED) {
+    musicOn = false;
+    playBtn.textContent = '▶';
+    playBtn.classList.remove('playing');
+  } else if (e.data === YT.PlayerState.ENDED) {
+    musicOn = false;
+    playBtn.textContent = '▶';
+    playBtn.classList.remove('playing');
+  }
+}
+function onPlayerError(e) {
+  console.error('YouTube hata:', e.data);
+  fallbackEmbed();
+}
+function actuallyPlay() {
+  if (!ytReady || !ytPlayer || !ytPlayer.playVideo) { pendingPlay = true; return; }
+  ytPlayer.seekTo(START_AT, true);
+  ytPlayer.playVideo();
+  if (musicMuted) ytPlayer.mute();
+}
+function fallbackEmbed() {
+  const wrap = document.getElementById('ytPlayer');
+  wrap.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&start=${START_AT}&controls=0&modestbranding=1&rel=0&playsinline=1`;
+  iframe.style.cssText = 'width:320px;height:180px;border:0;';
+  iframe.allow = 'autoplay; encrypted-media';
+  wrap.appendChild(iframe);
+}
+
+/* ============================================================
+   KONTROL BUTONLARI
+============================================================ */
+const playBtn = document.getElementById('playBtn');
+const muteBtn = document.getElementById('muteBtn');
+const timeDisplay = document.getElementById('timeDisplay');
+const progressFill = document.getElementById('progressFill');
+
+playBtn.addEventListener('click', () => {
+  if (!ytReady) { pendingPlay = true; return; }
+  if (musicOn) ytPlayer.pauseVideo();
+  else actuallyPlay();
+});
+muteBtn.addEventListener('click', () => {
+  if (!ytReady) return;
+  musicMuted = !musicMuted;
+  if (musicMuted) ytPlayer.mute(); else ytPlayer.unMute();
+  muteBtn.textContent = musicMuted ? '🔇' : '🔊';
+});
+
+function formatTime(s) {
+  s = Math.max(0, Math.floor(s));
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+setInterval(() => {
+  if (!ytReady || !ytPlayer || !ytPlayer.getCurrentTime || !started) return;
+  const cur = ytPlayer.getCurrentTime() || 0;
+  const dur = ytPlayer.getDuration() || 0;
+  progressFill.style.width = (dur > 0 ? (cur / dur) * 100 : 0) + '%';
+  timeDisplay.textContent = formatTime(cur) + ' / ' + formatTime(dur);
+}, 500);
+
+/* ============================================================
+   OTOMATİK SAHNE SİSTEMİ
+============================================================ */
+const stage = document.getElementById('stage');
+const scenes = document.querySelectorAll('.scene');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+let currentScene = 0;
+let started = false;
+let autoTimer = null;
+let paused = false;
+
+function showScene(idx) {
+  if (idx < 0 || idx >= scenes.length) return false;
+  // Önceki aktif sahneyi kapat
+  scenes.forEach(s => s.classList.remove('active'));
+  currentScene = idx;
+  scenes[currentScene].classList.add('active');
+  scenes[currentScene].scrollTop = 0;
+
+  // Sarılma sahnesinde ekstra kalpler
+  if (scenes[currentScene].querySelector('.couple.hugging')) {
+    setTimeout(() => {
+      for (let i = 0; i < 20; i++) setTimeout(createHeart, i * 80);
+    }, 800);
+  }
+  confettiBurst();
+  for (let i = 0; i < 6; i++) setTimeout(createHeart, i * 100);
+
+  return true;
+}
+
+function scheduleNext() {
+  clearTimeout(autoTimer);
+  if (paused) return;
+  if (currentScene >= scenes.length - 1) return;
+  if (scenes[currentScene].dataset.last === 'true') return;
+  const dur = parseInt(scenes[currentScene].dataset.duration || 6000);
+  autoTimer = setTimeout(() => {
+    if (currentScene < scenes.length - 1) {
+      showScene(currentScene + 1);
+      scheduleNext();
+    }
+  }, dur);
+}
+
+function nextScene() {
+  if (currentScene < scenes.length - 1) {
+    showScene(currentScene + 1);
+    scheduleNext();
+  }
+}
+
+function prevScene() {
+  if (currentScene > 0) {
+    showScene(currentScene - 1);
+    scheduleNext();
+  }
+}
+
+prevBtn.addEventListener('click', () => { paused = true; clearTimeout(autoTimer); prevScene(); });
+nextBtn.addEventListener('click', () => { paused = true; clearTimeout(autoTimer); nextScene(); });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); nextBtn.click(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevBtn.click(); }
+});
+
+/* ============================================================
+   SPARKLE alanları
+============================================================ */
+scenes.forEach(scene => {
+  const field = document.createElement('div');
+  field.className = 'sparkle-field';
+  for (let i = 0; i < 8; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'sparkle';
+    sp.style.left = Math.random() * 100 + '%';
+    sp.style.top = Math.random() * 100 + '%';
+    sp.style.animationDelay = (Math.random() * 5) + 's';
+    sp.style.animationDuration = (Math.random() * 3 + 4) + 's';
+    field.appendChild(sp);
+  }
+  scene.appendChild(field);
+});
+
+/* ============================================================
+   BAŞLANGIÇ  ← HATA BURADAYDI, DÜZELTİLDİ
+============================================================ */
+const splash = document.getElementById('splash');
+const startBtn = document.getElementById('startBtn');
+
+startBtn.addEventListener('click', () => {
+  splash.classList.add('gone');
+  started = true;
+  paused = false;
+  actuallyPlay();
+  confettiBurst();
+  setTimeout(() => {
+    for (let i = 0; i < 6; i++) setTimeout(createHeart, i * 100);
+  }, 500);
+  // İlk sahne zaten aktif, sadece zamanlayıcıyı başlat
+  scheduleNext();
+});
+
+document.getElementById('replayBtn').addEventListener('click', () => {
+  paused = false;
+  clearTimeout(autoTimer);
+  if (ytReady && ytPlayer.seekTo) {
+    ytPlayer.seekTo(START_AT, true);
+    if (!musicOn) ytPlayer.playVideo();
+  }
+  showScene(0);
+  scheduleNext();
+  confettiBurst();
+  for (let i = 0; i < 20; i++) setTimeout(createHeart, i * 60);
+});
+
+setInterval(() => {
+  if (started && Math.random() > 0.65) createHeart();
+}, 4000);
+</script>
+</body>
+</html>
