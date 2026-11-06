@@ -637,10 +637,8 @@
   <div class="splash-note">🎵 Kulaklığını tak, sesini aç.</div>
 </div>
 
-<!-- MP3 AUDIO (gizli) -->
-<audio id="audioPlayer" preload="auto" loop>
-  <source src="sarki.mp3" type="audio/mpeg">
-</audio>
+<!-- MP3 AUDIO (gizli) - src doğrudan burada -->
+<audio id="audioPlayer" preload="auto" loop src="sarki.mp3"></audio>
 
 <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
@@ -900,7 +898,7 @@ function confettiBurst() {
 }
 
 /* ============================================================
-   🎵 AUDIO KONTROLÜ (sağlam versiyon)
+   🎵 AUDIO KONTROLÜ (sağlam versiyon + debug)
 ============================================================ */
 const audio = document.getElementById('audioPlayer');
 const playBtn = document.getElementById('playBtn');
@@ -910,24 +908,50 @@ const progressFill = document.getElementById('progressFill');
 let musicOn = false;
 let audioReady = false;
 
-// Yükleme
+// DEBUG: Audio elementinin gerçek src'sini göster
+console.log('🔍 Audio elementi hazır. src:', audio.src);
+
+// Yükleme başarılı
 audio.addEventListener('loadedmetadata', () => {
   audioReady = true;
-  console.log('✅ Ses yüklendi. Süre:', audio.duration);
+  console.log('✅ Ses yüklendi. Süre:', audio.duration, 'saniye');
   timeDisplay.textContent = formatTime(START_AT) + ' / ' + formatTime(audio.duration);
-  // 0:39'a atla
   try {
     if (audio.currentTime < START_AT) audio.currentTime = START_AT;
   } catch(e) { console.warn('Seek hatası:', e); }
 });
 
-audio.addEventListener('canplay', () => { audioReady = true; });
+audio.addEventListener('canplay', () => {
+  audioReady = true;
+  console.log('✅ canplay: Ses çalmaya hazır.');
+});
+
+// Yükleme hatası - detaylı
+audio.addEventListener('error', (e) => {
+  const code = audio.error ? audio.error.code : '?';
+  const messages = {
+    1: 'Yükleme iptal edildi',
+    2: 'Ağ hatası',
+    3: 'Ses çözülemedi (bozuk dosya?)',
+    4: 'Format desteklenmiyor veya dosya bulunamadı'
+  };
+  console.error('❌ Ses hatası. Kod:', code, '-', messages[code] || 'Bilinmeyen');
+  console.error('❌ Denenen URL:', audio.currentSrc || audio.src);
+  console.error('❌ Bu URL doğrudan tarayıcıda açılabiliyor mu? Test et!');
+  timeDisplay.textContent = '⚠️ sarki.mp3 yüklenemedi (kod ' + code + ')';
+  timeDisplay.classList.add('active');
+});
+
+// İlk yükleme hatası (network)
+audio.addEventListener('stalled', () => console.warn('⚠️ Ses yükleme takıldı (stalled)'));
+audio.addEventListener('suspend', () => console.log('⏸ Ses yükleme duraklatıldı (suspend)'));
 
 audio.addEventListener('play', () => {
   musicOn = true;
   playBtn.textContent = '⏸';
   playBtn.classList.add('playing');
   timeDisplay.classList.add('active');
+  console.log('▶ Çalıyor');
 });
 
 audio.addEventListener('pause', () => {
@@ -936,54 +960,43 @@ audio.addEventListener('pause', () => {
   playBtn.classList.remove('playing');
 });
 
-audio.addEventListener('error', (e) => {
-  const code = audio.error ? audio.error.code : '?';
-  console.error('❌ Ses hatası. Kod:', code, '| Kaynak:', audio.currentSrc || audio.src);
-  let msg = '⚠️ Ses yüklenemedi';
-  if (code === 4) msg = '⚠️ sarki.mp3 bulunamadı';
-  timeDisplay.textContent = msg;
-  timeDisplay.classList.add('active');
-});
-
 function startPlayback() {
-  if (!audioReady) {
-    // Metadata henüz yüklenmediyse bekle, sonra çal
-    audio.addEventListener('loadedmetadata', () => {
-      try { audio.currentTime = START_AT; } catch(e){}
-      audio.play().catch(err => console.warn('Play hatası:', err));
-    }, { once: true });
-    // Yüklemeyi tetikle
-    audio.load();
-    return;
-  }
+  console.log('▶ startPlayback çağrıldı. audioReady:', audioReady, '| currentTime:', audio.currentTime);
+
   // 0:39'a konumlan
-  try {
-    if (Math.abs(audio.currentTime - START_AT) > 3) {
-      audio.currentTime = START_AT;
-    }
-  } catch(e) {}
-  // Çal
+  const seek = () => {
+    try {
+      if (Math.abs(audio.currentTime - START_AT) > 3) {
+        audio.currentTime = START_AT;
+        console.log('⏩ 0:39\'a atlandı');
+      }
+    } catch(e) { console.warn('Seek hatası:', e); }
+  };
+
+  if (audio.readyState >= 1) {
+    seek();
+  } else {
+    audio.addEventListener('loadedmetadata', seek, { once: true });
+    audio.load(); // yüklemeyi tetikle
+  }
+
   const p = audio.play();
   if (p !== undefined) {
-    p.catch(err => {
-      console.warn('play() engellendi:', err);
-      // Sessiz başlatıp sesi aç dene
-      audio.volume = 0.001;
-      audio.play().then(() => {
-        audio.volume = 1;
-      }).catch(e2 => {
-        console.error('Sessiz de başlamadı:', e2);
-      });
-    });
+    p.then(() => console.log('✅ play() başarılı'))
+     .catch(err => {
+       console.warn('❌ play() reddedildi:', err.name, err.message);
+       // Sessiz başlatıp sesi aç
+       audio.volume = 0.001;
+       audio.play().then(() => {
+         audio.volume = 1;
+         console.log('✅ Sessiz başlatıldı, ses açıldı');
+       }).catch(e2 => console.error('❌ Sessiz de başlamadı:', e2));
+     });
   }
-}
-
-function stopPlayback() {
-  audio.pause();
 }
 
 playBtn.addEventListener('click', () => {
-  if (musicOn) stopPlayback();
+  if (musicOn) audio.pause();
   else startPlayback();
 });
 
@@ -993,13 +1006,12 @@ muteBtn.addEventListener('click', () => {
 });
 
 function formatTime(s) {
-  s = Math.max(0, Math.floor(s));
+  s = Math.max(0, Math.floor(s || 0));
   const m = Math.floor(s / 60);
   const sec = s % 60;
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-// İlerleme çubuğu
 setInterval(() => {
   if (!started) return;
   const cur = audio.currentTime || 0;
